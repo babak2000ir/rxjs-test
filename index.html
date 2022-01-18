@@ -17,7 +17,7 @@
 
 
     <script>
-        var { fromEvent, interval, Observable, shareReplay } = rxjs;
+        var { fromEvent, interval, Observable, shareReplay, concat } = rxjs;
         var { scan, map, tap } = rxjs.operators;
 
         //var theButton = document.getElementById('the-btn');
@@ -87,22 +87,23 @@
                 //observer.next(add());
                 a = add(); 
                 observer.next(a);
+                observer.complete();
             }, 10000);
         }).pipe(
             tap(content => console.log(`Tapped Content:${content}`)),
-            shareReplay()
+            //shareReplay()
         );
 
-        data$
-            .subscribe({
-                next: data => console.log(`%c ${data}`, 'background: white; color: blue'),
-                complete: data => console.log('Complete message'),
-            })
+        // data$
+        //     .subscribe({
+        //         next: data => console.log(`%c ${data}`, 'background: white; color: blue'),
+        //         complete: data => console.log('Complete message'),
+        //     })
 
-        data$
-            .subscribe({
-                next: data => console.log(data),
-            })
+        // data$
+        //     .subscribe({
+        //         next: data => console.log(data),
+        //     })
 
         const dataClone$ = data$.pipe(
             map(stuff =>
@@ -111,7 +112,12 @@
             )
         );
 
-        dataClone$.subscribe(data => {
+        // dataClone$.subscribe(data => {
+        //     console.log(data);
+        // });
+
+        const allThree = concat(data$, data$);
+        allThree.subscribe(data => {
             console.log(data);
         });
     </script>
