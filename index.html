@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/7.5.2/rxjs.umd.min.js"
+        integrity="sha512-wBEi/LQM8Pi08xK2jwHJNCiHchHnfcJao0XVQvkTGc91Q/yvC/6q0xPf+qQr54SlG8yRbRCA8QDYrA98+0H+hg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body>
+    <p>Dude!</p>
+    <button id="the-btn">Clicker</button>
+
+
+    <script>
+        var { fromEvent, interval, Observable, shareReplay } = rxjs;
+        var { scan, map, tap } = rxjs.operators;
+
+        //var theButton = document.getElementById('the-btn');
+
+        // fromEvent(theButton, 'click')
+        //     .pipe(scan(count => count + 1, 0))
+        //     .subscribe(count => console.log(`Clicked ${count} times`));
+
+        //const interval$ = interval(1000);
+        //interval$.subscribe(v => console.log(`%c ${v}`, 'background: white; color: blue'))
+
+        /* const myPromise = new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve('Wooooooow!');
+            }, 3000);
+        });
+
+        const obsv$ = Observable.create(observer => {
+            myPromise
+                .then(data => {
+                    observer.next(data);
+                    if (data === 'end') {
+                        observer.complete();
+                    }
+                })
+                .catch(err => observer.error(err));
+        });
+
+        obsv$.subscribe(data => {
+            console.log(data);
+        }); */
+
+        function createCounter() {
+            let counter = 0;
+            function increment() {
+                counter++;
+                return counter;
+            }
+            return increment;
+        }
+
+        let add = createCounter();
+
+        const data$ = Observable.create(observer => {
+            let a = 0;
+
+            setTimeout(() => {
+                //observer.next(new Date().getMilliseconds());
+                //observer.next(add());
+                a = add(); 
+                observer.next(a);
+            }, 2000);
+            setTimeout(() => {
+                //observer.next(new Date().getMilliseconds());
+                //observer.next(add());
+                a = add(); 
+                observer.next(a);
+            }, 5000);
+            setTimeout(() => {
+                //observer.next(new Date().getMilliseconds());
+                //observer.next(add());
+                a = add(); 
+                observer.next(a);
+            }, 7000);
+            setTimeout(() => {
+                //observer.complete();
+                //observer.next(add());
+                a = add(); 
+                observer.next(a);
+            }, 10000);
+        }).pipe(
+            tap(content => console.log(`Tapped Content:${content}`)),
+            shareReplay()
+        );
+
+        data$
+            .subscribe({
+                next: data => console.log(`%c ${data}`, 'background: white; color: blue'),
+                complete: data => console.log('Complete message'),
+            })
+
+        data$
+            .subscribe({
+                next: data => console.log(data),
+            })
+
+        const dataClone$ = data$.pipe(
+            map(stuff =>
+                //Object.values(stuff)
+                stuff
+            )
+        );
+
+        dataClone$.subscribe(data => {
+            console.log(data);
+        });
+    </script>
+</body>
+
+</html>
