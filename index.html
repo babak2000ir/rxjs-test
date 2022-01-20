@@ -17,8 +17,8 @@
 
 
     <script>
-        var { fromEvent, interval, Observable, shareReplay, concat } = rxjs;
-        var { scan, map, tap } = rxjs.operators;
+        var { fromEvent, interval, Observable, shareReplay, concat, of, from } = rxjs;
+        var { scan, map, tap, concatMap } = rxjs.operators;
 
         //var theButton = document.getElementById('the-btn');
 
@@ -61,38 +61,86 @@
 
         let add = createCounter();
 
-        const data$ = Observable.create(observer => {
+        const data1$ = Observable.create(observer => {
             let a = 0;
 
             setTimeout(() => {
                 //observer.next(new Date().getMilliseconds());
                 //observer.next(add());
-                a = add(); 
-                observer.next(a);
+                a = add();
+                observer.next(`1:${a}`);
+            }, 1000);
+            setTimeout(() => {
+                //observer.next(new Date().getMilliseconds());
+                //observer.next(add());
+                a = add();
+                observer.next(`1:${a}`);
             }, 2000);
             setTimeout(() => {
                 //observer.next(new Date().getMilliseconds());
                 //observer.next(add());
-                a = add(); 
-                observer.next(a);
-            }, 5000);
-            setTimeout(() => {
-                //observer.next(new Date().getMilliseconds());
-                //observer.next(add());
-                a = add(); 
-                observer.next(a);
-            }, 7000);
+                a = add();
+                observer.next(`1:${a}`);
+            }, 3000);
             setTimeout(() => {
                 //observer.complete();
                 //observer.next(add());
-                a = add(); 
-                observer.next(a);
+                a = add();
+                observer.next(`1:${a}`);
                 observer.complete();
-            }, 10000);
+            }, 4000);
         }).pipe(
-            tap(content => console.log(`Tapped Content:${content}`)),
+            //tap(content => console.log(`Tapped data1$ Content:${content}`)),
             //shareReplay()
         );
+
+        const data2$ = Observable.create(observer => {
+            let a = 0;
+
+            setTimeout(() => {
+                //observer.next(new Date().getMilliseconds());
+                //observer.next(add());
+                a = add();
+                observer.next(`2:${a}`);
+            }, 1000);
+            setTimeout(() => {
+                //observer.next(new Date().getMilliseconds());
+                //observer.next(add());
+                a = add();
+                observer.next(`2:${a}`);
+            }, 2000);
+            setTimeout(() => {
+                //observer.next(new Date().getMilliseconds());
+                //observer.next(add());
+                a = add();
+                observer.next(`2:${a}`);
+            }, 3000);
+            setTimeout(() => {
+                //observer.complete();
+                //observer.next(add());
+                a = add();
+                observer.next(`2:${a}`);
+                observer.complete();
+            }, 4000);
+        }).pipe(
+            //tap(content => console.log(`Tapped data2$ Content:${content}`)),
+            //shareReplay()
+        );
+
+        const sendDataOut$ = (input) => {
+            return Observable.create(observer => {
+                setTimeout(() => {
+                    observer.next(`Got: ${input}`);
+                }, 1000);
+                setTimeout(() => {
+                    observer.next(`Processed: ${input}`);
+                }, 2000);
+                setTimeout(() => {
+                    observer.next(`Done with: ${input}`);
+                    observer.complete();
+                }, 3000);
+            });
+        }
 
         // data$
         //     .subscribe({
@@ -105,21 +153,94 @@
         //         next: data => console.log(data),
         //     })
 
-        const dataClone$ = data$.pipe(
-            map(stuff =>
-                //Object.values(stuff)
-                stuff
-            )
-        );
+        // const dataClone$ = data$.pipe(
+        //     map(stuff =>
+        //         //Object.values(stuff)
+        //         stuff
+        //     )
+        // );
 
         // dataClone$.subscribe(data => {
         //     console.log(data);
         // });
 
-        const allThree = concat(data$, data$);
-        allThree.subscribe(data => {
-            console.log(data);
-        });
+        // const allThree = concat(data$, data$);
+        // allThree.subscribe(data => {
+        //     console.log(data);
+        // });
+
+        // data1$
+        //     .subscribe(data =>
+        //         console.log(data)
+        //     );
+        // data1$
+        //     .pipe(
+        //         concatMap(d =>
+        //             sdo = sendDataOut$(d)
+        //         )
+        //     )
+        //     .subscribe(data => {
+        //         console.log(data);
+        //         //     sendDataOut$(data).subscribe(data =>
+        //         //         console.log(data)
+        //         //     );;
+        //     });
+
+        // map(x => x * x)(of(1, 2, 3)).subscribe((v) => console.log(`Output is: ${v}`));
+
+        // of(1, 2, 3)
+        //     .pipe(
+        //         map(x => x * x)
+        //     )
+        //     .subscribe(v => console.log(`Output is: ${v}`));
+
+
+        function crazyFunc(func) {
+            return (function () { return func })
+        }
+
+        //crazyFunc(x => console.log(x))()('hello');
+        //crazyFunc(crazyFunc(x => console.log(x)))()()('hello');
+
+        function crazyFunc2(func) {
+            return func;
+        }
+
+        //crazyFunc2(crazyFunc2(x => { console.log(x+10)}))(2);
+        //crazyFunc2(() => console.log('hello'))();
+
+        function crazyFunc3(func) {
+            return func();
+        }
+
+        //crazyFunc3(() => console.log('biibs'));
+
+
+
+        // //Normal promise
+        // const createPromise = new Promise((resolve, reject) => {
+        //     console.log('making the promise');
+        //     setTimeout(() => {
+        //         console.log('firing resolve');
+        //         resolve('foo');
+        //     }, 2000);
+        // });
+
+        //deffered promise
+        function createPromise() {
+            return () => {
+                return new Promise((resolve, reject) => {
+                    console.log('making the promise');
+                    setTimeout(() => {
+                        console.log('firing resolve');
+                        resolve('foo');
+                    }, 2000);
+                });
+            }
+        }
+
+        console.log('Before calling promise');
+        createPromise()().then(data => console.log(data));
     </script>
 </body>
 
